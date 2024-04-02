@@ -1,17 +1,13 @@
-﻿using System;
+﻿using System.Collections;
+using System.IO;
+using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
-using System.Collections;
-using System.IO;
-using System.Net;
-using System.Text.RegularExpressions;
 using System.Windows.Media;
-using System.Windows.Media.Converters;
-using System.Windows.Ink;
-using System.Windows.Documents;
+using System.Net.Http;
 
 namespace BS.to_Tools
 {
@@ -36,6 +32,7 @@ namespace BS.to_Tools
             this.DragMove();
         }
 
+        public static readonly HttpClient httpClient = new HttpClient();
         public string[] config = new string[255];
         public ArrayList bookmarks_scan = new ArrayList();
         public int bookmarks_n = 0;
@@ -52,7 +49,7 @@ namespace BS.to_Tools
             config[2] = "filter3=";
             config[3] = "und/oder/nicht=oder";
             config[4] = "mehrfach/einzel=mehrfach";
-            config[5] = "immererstestaffel=false";
+            config[5] = "immer_erste_staffel=false";
         }
 
         public void LoadConfig()
@@ -60,7 +57,6 @@ namespace BS.to_Tools
             if (File.Exists("config.txt"))
             {
                 config = File.ReadAllLines("config.txt", Encoding.UTF8);
-                //bookmarks_n = File.ReadAllLines("bookmarks_scan.txt", Encoding.UTF8).Length;
             }
             else
             {
@@ -68,35 +64,34 @@ namespace BS.to_Tools
                 File.WriteAllLines("config.txt", config, Encoding.UTF8);
             }
 
-            if (File.Exists("bookmarks_scan.txt"))
-            {
-                bookmarks_n = File.ReadAllLines("bookmarks_scan.txt", Encoding.UTF8).Length;
-                string[] bookmarks_tmp = new string[bookmarks_n];
-                bookmarks_tmp = File.ReadAllLines("bookmarks_scan.txt", Encoding.UTF8);
-
-                for (int i = 0; i < bookmarks_tmp.Length; i++)
-                {
-                    if (Regex.IsMatch(bookmarks_tmp[i], @"bs\.to/serie/"))
-                    {
-                        bookmarks_scan.Add(bookmarks_tmp[i].ToString());
-                    }
-                }
-                if (bookmarks_scan.Count > 0)
-                {
-                    txt_know.Text = bookmarks_scan.Count + " Bookmarks" + "\n" + "ausgelesen..";
-                }
-                else
-                {
-                    txt_know.Visibility = Visibility.Collapsed;
-                    tb_know.Visibility = Visibility.Collapsed;
-                }
-            }
-            else
-            {
-                string[] bookmarks_scan_array = (string[])bookmarks_scan.ToArray(typeof(string));
-                File.WriteAllLines("bookmarks_scan.txt", bookmarks_scan_array, Encoding.UTF8);
-            }
-
+            //if (File.Exists("bookmarks_scan.txt"))
+            //{
+            //    bookmarks_n = File.ReadAllLines("bookmarks_scan.txt", Encoding.UTF8).Length;
+            //    string[] bookmarks_tmp = new string[bookmarks_n];
+            //    bookmarks_tmp = File.ReadAllLines("bookmarks_scan.txt", Encoding.UTF8);
+            //
+            //    for (int i = 0; i < bookmarks_tmp.Length; i++)
+            //    {
+            //        if (Regex.IsMatch(bookmarks_tmp[i], @"bs\.to/serie/"))
+            //        {
+            //            bookmarks_scan.Add(bookmarks_tmp[i].ToString());
+            //        }
+            //    }
+            //    if (bookmarks_scan.Count > 0)
+            //    {
+            //        txt_know.Text = bookmarks_scan.Count + " Bookmarks" + "\n" + "ausgelesen..";
+            //    }
+            //    else
+            //    {
+            //        txt_know.Visibility = Visibility.Collapsed;
+            //        tb_know.Visibility = Visibility.Collapsed;
+            //    }
+            //}
+            //else
+            //{
+            //    string[] bookmarks_scan_array = (string[])bookmarks_scan.ToArray(typeof(string));
+            //    File.WriteAllLines("bookmarks_scan.txt", bookmarks_scan_array, Encoding.UTF8);
+            //}
         }
 
         public void SetConfig()
@@ -112,8 +107,15 @@ namespace BS.to_Tools
 
             for (int i = 0; i < cb_1.Items.Count; i++)
             {
-                cb_items[i] = (ComboBoxItem)cb_1.Items.GetItemAt(i);
-                items[i] = cb_items[i].Content.ToString();
+                var item = cb_1.Items.GetItemAt(i) as ComboBoxItem;
+                if (item != null)
+                {
+                    items[i] = item.Content?.ToString() ?? "";
+                }
+                else
+                {
+                    items[i] = "";
+                }
             }
 
             cb_2.Items.Clear();
@@ -210,11 +212,11 @@ namespace BS.to_Tools
 
             if (chb_first.IsChecked == true)
             {
-                config[5] = "immererstestaffel=true";
+                config[5] = "immer_erste_staffel=true";
             }
             else
             {
-                config[5] = "immererstestaffel=false";
+                config[5] = "immer_erste_staffel=false";
             }
 
             if (File.Exists("config.txt"))
@@ -241,7 +243,7 @@ namespace BS.to_Tools
             tab3.Visibility = Visibility.Collapsed;
             tab1.Visibility = Visibility.Visible;
             btn_tab2.Foreground = Brushes.Gray;
-            btn_tab3.Foreground = Brushes.Gray;
+            //btn_tab3.Foreground = Brushes.Gray;
             btn_tab1.Foreground = Brushes.Black;
         }
         private void btn_tab2_click(object sender, RoutedEventArgs e)
@@ -250,7 +252,7 @@ namespace BS.to_Tools
             tab3.Visibility = Visibility.Collapsed;
             tab2.Visibility = Visibility.Visible;
             btn_tab1.Foreground = Brushes.Gray;
-            btn_tab3.Foreground = Brushes.Gray;
+            //btn_tab3.Foreground = Brushes.Gray;
             btn_tab2.Foreground = Brushes.Black;
         }
         private void btn_tab3_click(object sender, RoutedEventArgs e)
@@ -260,225 +262,230 @@ namespace BS.to_Tools
             tab3.Visibility = Visibility.Visible;
             btn_tab1.Foreground = Brushes.Gray;
             btn_tab2.Foreground = Brushes.Gray;
-            btn_tab3.Foreground = Brushes.Black;
+            //btn_tab3.Foreground = Brushes.Black;
         }
 
         // Neue Folgen:
-        public string[] RegexExtract()
+        public async Task<string[]> RegexExtractAsync()
         {
-            using (WebClient web = new WebClient())
+            string pattern1 = @".*(\t\t\t\t\t\t<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+(\s\s[^\n]+)[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+)[^\n]+.*";
+            string pattern2 = @"\t\t\t\t\t\t<a href=serie(/[^/]+/\d+/)[^\n]+[\n][^\n]+info>([^<]+)[^\n]+title=([^>]+)[^\n]+[\n][^\n]+[\n][^\n]+";
+            string[] extracts = new string[255];
+            string[] urls = new string[255];
+            string[] webdata = new string[255];
+            string input = "404";
+            string cb_1_3 = "(" + cb_1.Text;
+
+            try
             {
-                string pattern1 = @".*(\t\t\t\t\t\t<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+(\s\s[^\n]+)[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+<a href=serie[^\n]+class=[^\n]+[\n][^\n]+[\n][^\n]+[\n][^\<]+)[^\n]+.*";
-                string pattern2 = @"\t\t\t\t\t\t<a href=serie(/[^/]+/\d+/)[^\n]+[\n][^\n]+info>([^<]+)[^\n]+title=([^>]+)[^\n]+[\n][^\n]+[\n][^\n]+";
-                string[] extracts = new string[255];
-                string[] urls = new string[255];
-                string[] webdata = new string[255];
-                string input = "404";
-                string cb_1_3 = "(" + cb_1.Text;
-
-                try
-                {
-                    input = web.DownloadString("https://bs.to");
-                }
-                catch (Exception)
-                {
-                    input = "404";
-                }
-
-                // Vorbearbeitung
-                input = Regex.Replace(input, "\"", "", RegexOptions.Singleline);
-
-                // Relevanten Text rausziehen
-                input = Regex.Replace(input, pattern1, "$1$2", RegexOptions.Singleline);
-
-                // Relevanten Text -> Aufrufbare URL's; (ohne LineBrake)
-                string extractURL = Regex.Replace(input, pattern2, @"https://bs.to/serie$1de;", RegexOptions.Singleline);
-                extractURL = Regex.Replace(extractURL, @"\n+", "", RegexOptions.Singleline);
-
-                // Relevanten Text -> URL;Staffel Episode;Sprache; (ohne LineBrake)
-                string extract = Regex.Replace(input, pattern2, @"https://bs.to/serie$1de;$2;$3;", RegexOptions.Singleline);
-                extract = Regex.Replace(extract, @"\n+", "", RegexOptions.Singleline);
-
-                if (rb_or.IsChecked == true)
-                {
-                    if (cb_2.Text != "" && cb_3.Text != "")
-                    {
-                        cb_1_3 += "|" + cb_2.Text + "|" + cb_3.Text + ")";
-                    }
-                    else if (cb_2.Text != "")
-                    {
-                        cb_1_3 += "|" + cb_2.Text + ")";
-                    }
-                    else if (cb_3.Text != "")
-                    {
-                        cb_1_3 += "|" + cb_3.Text + ")";
-                    }
-                    else
-                    {
-                        cb_1_3 += ")";
-                    }
-
-                    for (int i = 0; i < homepagelinks; i++)
-                    {
-                        // Oberste URL aus String(extractURLs) in Array[i](urls) laden
-                        urls[i] = Regex.Replace(extractURL, @"(https://bs.to/serie/[^;]+);.*", "$1", RegexOptions.Singleline);
-
-                        // Überprüfe Webseite von urls[i] auf String(cb_1_3)
-                        try
-                        {
-                            webdata[i] = web.DownloadString(urls[i]);
-                        }
-                        catch (Exception)
-                        {
-                            webdata[i] = "404";
-                        }
-                        if (Regex.IsMatch(webdata[i], cb_1_3, RegexOptions.Singleline))
-                        {
-                            // Oberste URL aus String(extract) in Array[i](extracts) laden
-                            extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
-                        }
-                        else
-                        {
-                            extracts[i] = "";
-                        }
-
-                        // Erste URL aus String(extractURLs) entfernen
-                        extractURL = extractURL.Substring(Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Index + Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Length);
-
-                        // Erste URL aus String(extract) entfernen
-                        extract = extract.Substring(Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Index + Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Length);
-                    }
-                }
-                else if (rb_not.IsChecked == true)
-                {
-                    if (cb_2.Text != "" && cb_3.Text != "")
-                    {
-                        cb_1_3 += "|" + cb_2.Text + "|" + cb_3.Text + ")";
-                    }
-                    else if (cb_2.Text != "")
-                    {
-                        cb_1_3 += "|" + cb_2.Text + ")";
-                    }
-                    else if (cb_3.Text != "")
-                    {
-                        cb_1_3 += "|" + cb_3.Text + ")";
-                    }
-                    else
-                    {
-                        cb_1_3 += ")";
-                    }
-
-                    for (int i = 0; i < homepagelinks; i++)
-                    {
-                        // Oberste URL aus String(extractURLs) in Array[i](urls) laden
-                        urls[i] = Regex.Replace(extractURL, @"(https://bs.to/serie/[^;]+);.*", "$1", RegexOptions.Singleline);
-
-                        // Überprüfe Webseite von urls[i] auf String(cb_1_3)
-                        try
-                        {
-                            webdata[i] = web.DownloadString(urls[i]);
-                        }
-                        catch (Exception)
-                        {
-                            webdata[i] = "404";
-                        }
-                        if (Regex.IsMatch(webdata[i], cb_1_3, RegexOptions.Singleline))
-                        {
-                            extracts[i] = "";
-                        }
-                        else
-                        {
-                            // Oberste URL aus String(extract) in Array[i](extracts) laden
-                            extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
-                        }
-
-                        // Erste URL aus String(extractURLs) entfernen
-                        extractURL = extractURL.Substring(Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Index + Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Length);
-
-                        // Erste URL aus String(extract) entfernen
-                        extract = extract.Substring(Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Index + Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Length);
-                    }
-                }
-                else if (rb_and.IsChecked == true)
-                {
-                    for (int i = 0; i < homepagelinks; i++)
-                    {
-                        // Oberste URL aus String(extractURLs) in Array[i](urls) laden
-                        urls[i] = Regex.Replace(extractURL, @"(https://bs.to/serie/[^;]+);.*", "$1", RegexOptions.Singleline);
-
-                        // Überprüfe Webseite von urls[i] auf String(cb_1_3)
-                        webdata[i] = web.DownloadString(urls[i]);
-
-                        if (cb_2.Text != "" && cb_3.Text != "")
-                        {
-                            if (Regex.IsMatch(webdata[i], cb_1.Text, RegexOptions.Singleline) && Regex.IsMatch(webdata[i], cb_2.Text, RegexOptions.Singleline) && Regex.IsMatch(webdata[i], cb_3.Text, RegexOptions.Singleline))
-                            {
-                                // Oberste URL aus String(extract) in Array[i](extracts) laden
-                                extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
-                            }
-                            else
-                            {
-                                extracts[i] = "";
-                            }
-                        }
-                        else if (cb_2.Text != "")
-                        {
-                            if (Regex.IsMatch(webdata[i], cb_1.Text, RegexOptions.Singleline) && Regex.IsMatch(webdata[i], cb_2.Text, RegexOptions.Singleline))
-                            {
-                                // Oberste URL aus String(extract) in Array[i](extracts) laden
-                                extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
-                            }
-                            else
-                            {
-                                extracts[i] = "";
-                            }
-                        }
-                        else if (cb_3.Text != "")
-                        {
-                            if (Regex.IsMatch(webdata[i], cb_1.Text, RegexOptions.Singleline) && Regex.IsMatch(webdata[i], cb_3.Text, RegexOptions.Singleline))
-                            {
-                                // Oberste URL aus String(extract) in Array[i](extracts) laden
-                                extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
-                            }
-                            else
-                            {
-                                extracts[i] = "";
-                            }
-                        }
-                        else
-                        {
-                            cb_1_3 = cb_1.Text;
-
-                            if (Regex.IsMatch(webdata[i], cb_1_3, RegexOptions.Singleline))
-                            {
-                                // Oberste URL aus String(extract) in Array[i](extracts) laden
-                                extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
-                            }
-                            else
-                            {
-                                extracts[i] = "";
-                            }
-                        }
-
-                        // Erste URL aus String(extractURLs) entfernen
-                        extractURL = extractURL.Substring(Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Index + Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Length);
-
-                        // Erste URL aus String(extract) entfernen
-                        extract = extract.Substring(Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Index + Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Length);
-                    }
-                }
-
-                // Array(extracts) übergeben
-                return extracts;
+                input = await httpClient.GetStringAsync("https://bs.to");
             }
+            catch (Exception)
+            {
+                input = "404";
+            }
+
+            // Vorbearbeitung
+            input = Regex.Replace(input, "\"", "", RegexOptions.Singleline);
+
+            // Relevanten Text rausziehen
+            input = Regex.Replace(input, pattern1, "$1$2", RegexOptions.Singleline);
+
+            // Relevanten Text -> Aufrufbare URL's; (ohne LineBrake)
+            string extractURL = Regex.Replace(input, pattern2, @"https://bs.to/serie$1de;", RegexOptions.Singleline);
+            extractURL = Regex.Replace(extractURL, @"\n+", "", RegexOptions.Singleline);
+
+            // Relevanten Text -> URL;Staffel Episode;Sprache; (ohne LineBrake)
+            string extract = Regex.Replace(input, pattern2, @"https://bs.to/serie$1de;$2;$3;", RegexOptions.Singleline);
+            extract = Regex.Replace(extract, @"\n+", "", RegexOptions.Singleline);
+
+            if (rb_or.IsChecked == true)
+            {
+                if (cb_2.Text != "" && cb_3.Text != "")
+                {
+                    cb_1_3 += "|" + cb_2.Text + "|" + cb_3.Text + ")";
+                }
+                else if (cb_2.Text != "")
+                {
+                    cb_1_3 += "|" + cb_2.Text + ")";
+                }
+                else if (cb_3.Text != "")
+                {
+                    cb_1_3 += "|" + cb_3.Text + ")";
+                }
+                else
+                {
+                    cb_1_3 += ")";
+                }
+
+                for (int i = 0; i < homepagelinks; i++)
+                {
+                    // Oberste URL aus String(extractURLs) in Array[i](urls) laden
+                    urls[i] = Regex.Replace(extractURL, @"(https://bs.to/serie/[^;]+);.*", "$1", RegexOptions.Singleline);
+
+                    // Überprüfe Webseite von urls[i] auf String(cb_1_3)
+                    try
+                    {
+                        webdata[i] = await httpClient.GetStringAsync(urls[i]);
+                    }
+                    catch (Exception)
+                    {
+                        webdata[i] = "404";
+                    }
+                    if (Regex.IsMatch(webdata[i], cb_1_3, RegexOptions.Singleline))
+                    {
+                        // Oberste URL aus String(extract) in Array[i](extracts) laden
+                        extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
+                    }
+                    else
+                    {
+                        extracts[i] = "";
+                    }
+
+                    // Erste URL aus String(extractURLs) entfernen
+                    extractURL = extractURL.Substring(Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Index + Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Length);
+
+                    // Erste URL aus String(extract) entfernen
+                    extract = extract.Substring(Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Index + Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Length);
+                }
+            }
+            else if (rb_not.IsChecked == true)
+            {
+                if (cb_2.Text != "" && cb_3.Text != "")
+                {
+                    cb_1_3 += "|" + cb_2.Text + "|" + cb_3.Text + ")";
+                }
+                else if (cb_2.Text != "")
+                {
+                    cb_1_3 += "|" + cb_2.Text + ")";
+                }
+                else if (cb_3.Text != "")
+                {
+                    cb_1_3 += "|" + cb_3.Text + ")";
+                }
+                else
+                {
+                    cb_1_3 += ")";
+                }
+
+                for (int i = 0; i < homepagelinks; i++)
+                {
+                    // Oberste URL aus String(extractURLs) in Array[i](urls) laden
+                    urls[i] = Regex.Replace(extractURL, @"(https://bs.to/serie/[^;]+);.*", "$1", RegexOptions.Singleline);
+
+                    // Überprüfe Webseite von urls[i] auf String(cb_1_3)
+                    try
+                    {
+                        webdata[i] = await httpClient.GetStringAsync(urls[i]);
+                    }
+                    catch (Exception)
+                    {
+                        webdata[i] = "404";
+                    }
+                    if (Regex.IsMatch(webdata[i], cb_1_3, RegexOptions.Singleline))
+                    {
+                        extracts[i] = "";
+                    }
+                    else
+                    {
+                        // Oberste URL aus String(extract) in Array[i](extracts) laden
+                        extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
+                    }
+
+                    // Erste URL aus String(extractURLs) entfernen
+                    extractURL = extractURL.Substring(Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Index + Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Length);
+
+                    // Erste URL aus String(extract) entfernen
+                    extract = extract.Substring(Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Index + Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Length);
+                }
+            }
+            else if (rb_and.IsChecked == true)
+            {
+                for (int i = 0; i < homepagelinks; i++)
+                {
+                    // Oberste URL aus String(extractURLs) in Array[i](urls) laden
+                    urls[i] = Regex.Replace(extractURL, @"(https://bs.to/serie/[^;]+);.*", "$1", RegexOptions.Singleline);
+
+                    // Überprüfe Webseite von urls[i] auf String(cb_1_3)
+                    webdata[i] = await httpClient.GetStringAsync(urls[i]);
+
+                    if (cb_2.Text != "" && cb_3.Text != "")
+                    {
+                        if (Regex.IsMatch(webdata[i], cb_1.Text, RegexOptions.Singleline) && Regex.IsMatch(webdata[i], cb_2.Text, RegexOptions.Singleline) && Regex.IsMatch(webdata[i], cb_3.Text, RegexOptions.Singleline))
+                        {
+                            // Oberste URL aus String(extract) in Array[i](extracts) laden
+                            extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
+                        }
+                        else
+                        {
+                            extracts[i] = "";
+                        }
+                    }
+                    else if (cb_2.Text != "")
+                    {
+                        if (Regex.IsMatch(webdata[i], cb_1.Text, RegexOptions.Singleline) && Regex.IsMatch(webdata[i], cb_2.Text, RegexOptions.Singleline))
+                        {
+                            // Oberste URL aus String(extract) in Array[i](extracts) laden
+                            extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
+                        }
+                        else
+                        {
+                            extracts[i] = "";
+                        }
+                    }
+                    else if (cb_3.Text != "")
+                    {
+                        if (Regex.IsMatch(webdata[i], cb_1.Text, RegexOptions.Singleline) && Regex.IsMatch(webdata[i], cb_3.Text, RegexOptions.Singleline))
+                        {
+                            // Oberste URL aus String(extract) in Array[i](extracts) laden
+                            extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
+                        }
+                        else
+                        {
+                            extracts[i] = "";
+                        }
+                    }
+                    else
+                    {
+                        cb_1_3 = cb_1.Text;
+
+                        if (Regex.IsMatch(webdata[i], cb_1_3, RegexOptions.Singleline))
+                        {
+                            // Oberste URL aus String(extract) in Array[i](extracts) laden
+                            extracts[i] = Regex.Replace(extract, @"(https://bs.to/serie/[^;]+;[^;]+;[^;]+;).*", "$1", RegexOptions.Singleline);
+                        }
+                        else
+                        {
+                            extracts[i] = "";
+                        }
+                    }
+
+                    // Erste URL aus String(extractURLs) entfernen
+                    extractURL = extractURL.Substring(Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Index + Regex.Match(extractURL, @"https://bs.to/serie/[^;]+;").Length);
+
+                    // Erste URL aus String(extract) entfernen
+                    extract = extract.Substring(Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Index + Regex.Match(extract, @"https://bs.to/serie/[^;]+;[^;]+;[^;]+;").Length);
+                }
+            }
+
+            // Array(extracts) übergeben
+            return extracts;
         }
 
-        private void btn_list_Click(object sender, RoutedEventArgs e)
+        private async void btn_list_Click(object sender, RoutedEventArgs e)
         {
             string[] extracts = new string[255];
             bool[] know = new bool[255];
             int n = 1;
-            extracts = RegexExtract();
+
+            try
+            {
+                extracts = await RegexExtractAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ein Fehler ist aufgetreten: {ex.Message}");
+            }
 
             txt_nr.Clear();
             txt_data.Clear();
@@ -522,13 +529,21 @@ namespace BS.to_Tools
             SaveConfig();
         }
 
-        private void btn_open_all_Click(object sender, RoutedEventArgs e)
+        private async void btn_open_all_Click(object sender, RoutedEventArgs e)
         {
             string[] sites = new string[255];
             int[] nr = new int[255];
             int meny = 0;
             int n = 1;
-            sites = RegexExtract();
+
+            try
+            {
+                sites = await RegexExtractAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ein Fehler ist aufgetreten: {ex.Message}");
+            }
 
             if (cb_meny.Text.Length > 0)
             {
