@@ -82,43 +82,49 @@
             <StackPanel Grid.Row="0" Margin="10,10,0,0" Orientation="Horizontal" HorizontalAlignment="Left">
                 <Label Content="Filter:" FontSize="14" Margin="0,-5,0,0" Foreground="LightGray" VerticalAlignment="Top"/>
                 <ComboBox x:Name="cb_1" DropDownOpened="cb_1_DropDownOpened" Focusable="False" VerticalAlignment="Top">
-                    <ComboBoxItem Content="Abenteuer"/>
-                    <ComboBoxItem Content="Action"/>
-                    <ComboBoxItem Content="Animation"/>
-                    <ComboBoxItem Content="Anime" IsSelected="True"/>
-                    <ComboBoxItem Content="Anime-Ecchi"/>
-                    <ComboBoxItem Content="Anime-Isekai"/>
-                    <ComboBoxItem Content="Anime-Mecha"/>
-                    <ComboBoxItem Content="Anime-Slice of Life"/>
-                    <ComboBoxItem Content="Anime-Super-Power"/>
-                    <ComboBoxItem Content="Anime-Supernatural"/>
-                    <ComboBoxItem Content="Comedy"/>
-                    <ComboBoxItem Content="Dokumentation"/>
-                    <ComboBoxItem Content="Dokusoap"/>
-                    <ComboBoxItem Content="Drama"/>
-                    <ComboBoxItem Content="Dramedy"/>
-                    <ComboBoxItem Content="Familie"/>
-                    <ComboBoxItem Content="Fantasy"/>
-                    <ComboBoxItem Content="Game"/>
-                    <ComboBoxItem Content="History"/>
-                    <ComboBoxItem Content="Horror"/>
-                    <ComboBoxItem Content="Jugend"/>
-                    <ComboBoxItem Content="K-Drama"/>
-                    <ComboBoxItem Content="Kinderserie"/>
-                    <ComboBoxItem Content="Krankenhaus"/>
-                    <ComboBoxItem Content="Krieg"/>
-                    <ComboBoxItem Content="Krimi"/>
-                    <ComboBoxItem Content="Märchen"/>
-                    <ComboBoxItem Content="Mystery"/>
-                    <ComboBoxItem Content="Reality-TV"/>
-                    <ComboBoxItem Content="Romantik"/>
-                    <ComboBoxItem Content="Science-Fiction"/>
-                    <ComboBoxItem Content="Sitcom"/>
-                    <ComboBoxItem Content="Sport"/>
-                    <ComboBoxItem Content="Telenovela"/>
-                    <ComboBoxItem Content="Thriller"/>
-                    <ComboBoxItem Content="Western"/>
-                    <ComboBoxItem Content="Zeichentrick"/>
+					<ComboBoxItem Content="Abenteuer"/>
+					<ComboBoxItem Content="Action"/>
+					<ComboBoxItem Content="Animation"/>
+					<ComboBoxItem Content="Anime" IsSelected="True"/>
+					<ComboBoxItem Content="Anime-China"/>
+					<ComboBoxItem Content="Anime-Ecchi"/>
+					<ComboBoxItem Content="Anime-Horror"/>
+					<ComboBoxItem Content="Anime-Isekai"/>
+					<ComboBoxItem Content="Anime-Mecha"/>
+					<ComboBoxItem Content="Anime-Musik"/>
+					<ComboBoxItem Content="Anime-Romance"/>
+					<ComboBoxItem Content="Anime-Slice of Life"/>
+					<ComboBoxItem Content="Anime-Sport"/>
+					<ComboBoxItem Content="Anime-Super-Power"/>
+					<ComboBoxItem Content="Anime-Supernatural"/>
+					<ComboBoxItem Content="Comedy"/>
+					<ComboBoxItem Content="Dokumentation"/>
+					<ComboBoxItem Content="Dokusoap"/>
+					<ComboBoxItem Content="Drama"/>
+					<ComboBoxItem Content="Dramedy"/>
+					<ComboBoxItem Content="Familie"/>
+					<ComboBoxItem Content="Fantasy"/>
+					<ComboBoxItem Content="Game"/>
+					<ComboBoxItem Content="History"/>
+					<ComboBoxItem Content="Horror"/>
+					<ComboBoxItem Content="Jugend"/>
+					<ComboBoxItem Content="K-Drama"/>
+					<ComboBoxItem Content="Kinderserie"/>
+					<ComboBoxItem Content="Krankenhaus"/>
+					<ComboBoxItem Content="Krieg"/>
+					<ComboBoxItem Content="Krimi"/>
+					<ComboBoxItem Content="Märchen"/>
+					<ComboBoxItem Content="Mystery"/>
+					<ComboBoxItem Content="Netflix"/>
+					<ComboBoxItem Content="Reality-TV"/>
+					<ComboBoxItem Content="Romantik"/>
+					<ComboBoxItem Content="Science-Fiction"/>
+					<ComboBoxItem Content="Sitcom"/>
+					<ComboBoxItem Content="Sport"/>
+					<ComboBoxItem Content="Telenovela"/>
+					<ComboBoxItem Content="Thriller"/>
+					<ComboBoxItem Content="Western"/>
+					<ComboBoxItem Content="Zeichentrick"/>
                 </ComboBox>
                 <ComboBox x:Name="cb_2" DropDownOpened="cb_2_DropDownOpened" Focusable="False" VerticalAlignment="Top"/>
                 <ComboBox x:Name="cb_3" DropDownOpened="cb_3_DropDownOpened" Focusable="False" VerticalAlignment="Top"/>
