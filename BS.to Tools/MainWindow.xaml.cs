@@ -34,8 +34,7 @@ namespace BS.to_Tools
 
         public static readonly HttpClient httpClient = new HttpClient();
         public string[] config = new string[255];
-        public ArrayList bookmarks_scan = new ArrayList();
-        public int bookmarks_n = 0;
+        public List<string> bookmarks_scan = new List<string>();
         public int homepagelinks = 20;
         public int index = 0;
         public string link = "";
@@ -65,34 +64,34 @@ namespace BS.to_Tools
                 config = File.ReadAllLines("config.txt", Encoding.UTF8);
             }
 
-            //if (File.Exists("bookmarks_scan.txt"))
-            //{
-            //    bookmarks_n = File.ReadAllLines("bookmarks_scan.txt", Encoding.UTF8).Length;
-            //    string[] bookmarks_tmp = new string[bookmarks_n];
-            //    bookmarks_tmp = File.ReadAllLines("bookmarks_scan.txt", Encoding.UTF8);
-            //
-            //    for (int i = 0; i < bookmarks_tmp.Length; i++)
-            //    {
-            //        if (Regex.IsMatch(bookmarks_tmp[i], @"bs\.to/serie/"))
-            //        {
-            //            bookmarks_scan.Add(bookmarks_tmp[i].ToString());
-            //        }
-            //    }
-            //    if (bookmarks_scan.Count > 0)
-            //    {
-            //        txt_know.Text = bookmarks_scan.Count + " Bookmarks" + "\n" + "ausgelesen..";
-            //    }
-            //    else
-            //    {
-            //        txt_know.Visibility = Visibility.Collapsed;
-            //        tb_know.Visibility = Visibility.Collapsed;
-            //    }
-            //}
-            //else
-            //{
-            //    string[] bookmarks_scan_array = (string[])bookmarks_scan.ToArray(typeof(string));
-            //    File.WriteAllLines("bookmarks_scan.txt", bookmarks_scan_array, Encoding.UTF8);
-            //}
+            if (File.Exists("bookmarks_scan.txt"))
+            {
+                var bookmarks_tmp = File.ReadAllLines("bookmarks_scan.txt", Encoding.UTF8);
+
+                foreach (var bookmark in bookmarks_tmp)
+                {
+                    if (Regex.IsMatch(bookmark, @"bs\.to/serie/"))
+                    {
+                        bookmarks_scan.Add(bookmark);
+                    }
+                }
+
+                if (bookmarks_scan.Count > 0)
+                {
+                    txt_know.Text = $"{bookmarks_scan.Count} Bookmarks ausgelesen..";
+                    txt_know.Visibility = Visibility.Visible;
+                    tb_know.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    txt_know.Visibility = Visibility.Collapsed;
+                    tb_know.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                File.WriteAllLines("bookmarks_scan.txt", bookmarks_scan, Encoding.UTF8);
+            }
         }
 
         public void SetConfig()
