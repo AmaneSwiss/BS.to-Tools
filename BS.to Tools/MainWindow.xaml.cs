@@ -62,6 +62,7 @@ namespace BS.to_Tools
             {
                 LoadStandardConfig();
                 File.WriteAllLines("config.txt", config, Encoding.UTF8);
+                config = File.ReadAllLines("config.txt", Encoding.UTF8);
             }
 
             //if (File.Exists("bookmarks_scan.txt"))
